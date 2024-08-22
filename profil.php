@@ -1,40 +1,39 @@
 <?php
 session_start();
 
-if (!isset($_SESSION['nom_utilisateur'])) {
-    header("location: connexion.php");
-    exit;
+if (!isset($_SESSION['id'])) {
+    header("Location: connexion.php");
+    exit();
 }
 
+require_once 'components/header.php';
 require_once 'includes/db.php';
 
-$nom_utilisateur = $_SESSION['nom_utilisateur'];
-$sql = "SELECT nom_utilisateur, email FROM utilisateurs WHERE nom_utilisateur = '$nom_utilisateur'";
-$result = $conn->query($sql);
+$id_utilisateur = $_SESSION['id'];
+$sql = "SELECT nom_utilisateur, email FROM utilisateurs WHERE id = ?";
+$stmt = $conn->prepare($sql);
+$stmt->bind_param("i", $id_utilisateur);
+$stmt->execute();
+$result = $stmt->get_result();
 
 if ($result->num_rows == 1) {
-    $row = $result->fetch_assoc();
-    $email = $row['email'];
+    $user = $result->fetch_assoc();
 } else {
-    echo "Erreur lors de la récupération des informations utilisateur.";
-    exit;
+    header("Location: deconnexion.php");
+    exit();
 }
 
+$stmt->close();
 $conn->close();
 ?>
 
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Profil</title>
-    <link rel="stylesheet" type="text/css" href="style.css">
-</head>
-<body>
-    <div class="container">
-        <h2>Profil</h2>
-        <p>Nom d'utilisateur: <?php echo htmlspecialchars($nom_utilisateur); ?></p>
-        <p>Email: <?php echo htmlspecialchars($email); ?></p>
-        <p><a href="deconnexion.php">Se déconnecter</a></p>
-    </div>
-</body>
-</html>
+<div class="container">
+    <h2>Profil de <?php echo htmlspecialchars($user['nom_utilisateur']); ?></h2>
+    <p><strong>Nom d'utilisateur:</strong> <?php echo htmlspecialchars($user['nom_utilisateur']); ?></p>
+    <p><strong>Email:</strong> <?php echo htmlspecialchars($user['email']); ?></p>
+    <p><a href="deconnexion.php">Se déconnecter</a></p>
+</div>
+
+<?php
+require_once 'components/footer.php';
+?>

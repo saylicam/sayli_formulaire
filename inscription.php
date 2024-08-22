@@ -1,7 +1,9 @@
 <?php
+$titrePage = "Inscription";
+$metaDescription = "Créez un compte sur notre site en remplissant le formulaire d'inscription.";
+$message = '';  // Initialisation de la variable $message
+require_once 'components/header.php';
 require_once 'includes/db.php';
-
-$message = '';
 
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $nom_utilisateur = $conn->real_escape_string($_POST['nom_utilisateur']);
@@ -11,9 +13,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $sql = "INSERT INTO utilisateurs (nom_utilisateur, email, mot_de_passe) VALUES ('$nom_utilisateur', '$email', '$mot_de_passe')";
 
     if ($conn->query($sql) === TRUE) {
-        // Rediriger vers la page de connexion après une inscription réussie
         header("Location: connexion.php");
-        exit(); // Assurez-vous d'arrêter le script après la redirection
+        exit();
     } else {
         $message = '<div class="message error">Erreur : ' . $sql . '<br>' . $conn->error . '</div>';
     }
@@ -22,22 +23,17 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 $conn->close();
 ?>
 
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Inscription</title>
-    <link rel="stylesheet" type="text/css" href="css/styles.css">
-</head>
-<body>
-    <div class="container">
-        <h2>Inscription</h2>
-        <?php echo $message; ?>
-        <form method="post">
-            Nom d'utilisateur: <input type="text" name="nom_utilisateur" required><br>
-            Email: <input type="email" name="email" required><br>
-            Mot de passe: <input type="password" name="mot_de_passe" required><br>
-            <input type="submit" value="S'inscrire">
-        </form>
-    </div>
-</body>
-</html>
+<div class="container">
+    <h2>Inscription</h2>
+    <?php echo $message; ?>
+    <form method="post">
+        Nom d'utilisateur: <input type="text" name="nom_utilisateur" required><br>
+        Email: <input type="email" name="email" required><br>
+        Mot de passe: <input type="password" name="mot_de_passe" required><br>
+        <input type="submit" value="S'inscrire">
+    </form>
+</div>
+
+<?php
+require_once 'components/footer.php';
+?>
